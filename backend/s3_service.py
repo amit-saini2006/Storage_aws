@@ -35,15 +35,17 @@ class S3Service:
     }
 
     def __init__(self):
-        self.bucket_name = os.getenv('S3_BUCKET_NAME', 'my-file-storage')
-        self.region = os.getenv('AWS_REGION', 'ap-south-1')
+        self.bucket_name = (os.getenv('S3_BUCKET_NAME') or 'my-file-storage').strip()
+        self.region = (os.getenv('AWS_REGION') or 'ap-south-1').strip()
         self.max_file_size = int(os.getenv('MAX_FILE_SIZE_MB', '50')) * 1024 * 1024  # bytes
 
+        aws_key = os.getenv('AWS_ACCESS_KEY_ID')
+        aws_secret = os.getenv('AWS_SECRET_ACCESS_KEY')
         self.s3_client = boto3.client(
             's3',
             region_name=self.region,
-            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+            aws_access_key_id=aws_key.strip() if aws_key else None,
+            aws_secret_access_key=aws_secret.strip() if aws_secret else None,
         )
 
     # ── Validation helpers ────────────────────────────────────────────
