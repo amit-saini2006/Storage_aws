@@ -1,0 +1,12 @@
+{
+  "name": "cloudvault-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloud-Based Personal File Storage System on AWS S3",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start:backend": "python backend/app.py",
+    "test:backend": "python -m pytest backend/tests/ -v"
+  }
+}
