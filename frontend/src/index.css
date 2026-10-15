@@ -1202,6 +1202,18 @@ input, select, textarea {
   border-radius: var(--radius-md);
 }
 
+.preview-video {
+  width: 100%;
+  max-height: 65vh;
+  border-radius: var(--radius-md);
+  background: #000;
+  box-shadow: var(--shadow-md);
+}
+
+.preview-audio {
+  width: 100%;
+}
+
 .preview-unavailable {
   padding: 40px;
   text-align: center;

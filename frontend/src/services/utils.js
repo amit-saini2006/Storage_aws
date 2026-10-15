@@ -90,7 +90,13 @@ export function getFileIcon(contentType) {
  */
 export function isPreviewable(contentType) {
   if (!contentType) return false;
-  return contentType.startsWith('image/') || contentType === 'application/pdf';
+  return (
+    contentType.startsWith('image/') ||
+    contentType === 'application/pdf' ||
+    contentType.startsWith('video/') ||
+    contentType.startsWith('audio/') ||
+    contentType.startsWith('text/')
+  );
 }
 
 /**

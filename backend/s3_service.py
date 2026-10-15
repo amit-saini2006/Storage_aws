@@ -136,16 +136,26 @@ class S3Service:
         return files
 
     def get_download_url(self, file_id: str, expires_in: int = 3600) -> str:
-        """Generate a presigned download URL (default: 1 hour)."""
+        """Generate a presigned download URL with attachment disposition."""
         # Validate key starts with expected prefix
         if not file_id.startswith('uploads/'):
             raise ValueError('Invalid file identifier.')
+
+        # Fetch original filename for Content-Disposition header
+        try:
+            head = self.s3_client.head_object(Bucket=self.bucket_name, Key=file_id)
+            original_name = head.get('Metadata', {}).get('original-filename', os.path.basename(file_id))
+        except ClientError:
+            original_name = os.path.basename(file_id)
+
+        safe_filename = os.path.basename(original_name).replace('"', '')
 
         url = self.s3_client.generate_presigned_url(
             'get_object',
             Params={
                 'Bucket': self.bucket_name,
                 'Key': file_id,
+                'ResponseContentDisposition': f'attachment; filename="{safe_filename}"',
             },
             ExpiresIn=expires_in,
         )

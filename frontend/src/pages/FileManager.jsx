@@ -80,7 +80,17 @@ export default function FileManager({ files, loading, onRefresh, addToast }) {
   const handleDownload = async (file) => {
     try {
       const url = await getDownloadUrl(file.file_id);
-      window.open(url, '_blank');
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', file.original_name || 'download');
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        if (document.body.contains(link)) {
+          document.body.removeChild(link);
+        }
+      }, 1000);
     } catch (err) {
       addToast('error', 'Download Failed', err.message);
     }
@@ -360,6 +370,25 @@ export default function FileManager({ files, loading, onRefresh, addToast }) {
                       className="preview-image"
                     />
                   ) : previewFile.content_type === 'application/pdf' ? (
+                    <iframe
+                      src={previewUrl}
+                      className="preview-iframe"
+                      title={previewFile.original_name}
+                    />
+                  ) : previewFile.content_type?.startsWith('video/') ? (
+                    <div style={{ textAlign: 'center', width: '100%' }}>
+                      <video
+                        src={previewUrl}
+                        controls
+                        autoPlay
+                        className="preview-video"
+                      />
+                    </div>
+                  ) : previewFile.content_type?.startsWith('audio/') ? (
+                    <div style={{ padding: '24px 12px', textAlign: 'center', width: '100%' }}>
+                      <audio src={previewUrl} controls autoPlay className="preview-audio" />
+                    </div>
+                  ) : previewFile.content_type?.startsWith('text/') ? (
                     <iframe
                       src={previewUrl}
                       className="preview-iframe"
