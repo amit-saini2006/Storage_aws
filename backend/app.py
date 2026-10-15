@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env BEFORE importing services
 load_dotenv()
 
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 
 # ── Choose storage backend ────────────────────────────────────────────
@@ -214,6 +214,27 @@ def serve_file(file_id):
         return jsonify({'error': 'File not found.'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+# ── Serve static frontend in production (if built) ────────────────────
+FRONTEND_DIST = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist')
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    """Serve built React single-page application in production."""
+    if path.startswith('api/'):
+        return jsonify({'error': 'Resource not found.'}), 404
+    file_path = os.path.join(FRONTEND_DIST, path)
+    if os.path.exists(file_path) and not os.path.isdir(file_path):
+        return send_from_directory(FRONTEND_DIST, path)
+    if os.path.exists(os.path.join(FRONTEND_DIST, 'index.html')):
+        return send_from_directory(FRONTEND_DIST, 'index.html')
+    return jsonify({
+        'status': 'CloudVault Backend API is running',
+        'frontend': 'Run `npm run build` in frontend to serve the UI directly from Flask.'
+    })
 
 
 # ── Entry point ───────────────────────────────────────────────────────
